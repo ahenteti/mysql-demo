@@ -11,6 +11,7 @@ public class MySQLDemo {
         try {
             createDatabase();
             createTable();
+            insertData();
             deleteDatabase();
         } catch (Exception e) {
             e.printStackTrace();
@@ -19,21 +20,30 @@ public class MySQLDemo {
 
     private static void createDatabase() throws SQLException {
         try (Connection connection = DriverManager.getConnection(getDbUrl())) {
-            String query = "CREATE DATABASE DATABASE_NAME";
+            String query = "CREATE DATABASE DB_USER";
             executeStatement(connection, query);
         }
     }
 
     private static void createTable() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(getDbUrl("DATABASE_NAME"))) {
-            String query = "CREATE TABLE TABLE_NAME (id INTEGER not NULL, PRIMARY KEY ( id ))";
+        try (Connection connection = DriverManager.getConnection(getDbUrl("DB_USER"))) {
+            String query = "CREATE TABLE T_USER (id INTEGER not NULL, age INTEGER not NULL, PRIMARY KEY ( id ))";
+            executeStatement(connection, query);
+        }
+    }
+
+    private static void insertData() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(getDbUrl("DB_USER"))) {
+            String query = "INSERT INTO T_USER (id, age) VALUES (1, 12)";
+            executeStatement(connection, query);
+            query = "INSERT INTO T_USER (id, age) VALUES (2, 13)";
             executeStatement(connection, query);
         }
     }
 
     private static void deleteDatabase() throws SQLException {
         try (Connection connection = DriverManager.getConnection(getDbUrl())) {
-            String query = "DROP DATABASE DATABASE_NAME";
+            String query = "DROP DATABASE DB_USER";
             executeStatement(connection, query);
         }
     }
