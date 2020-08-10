@@ -2,6 +2,7 @@ package io.github.ahenteti.mysqldemo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -15,7 +16,9 @@ public class MySQLDemo {
             createTable();
             insertData();
             createGetUsersCountProcedure();
+            callGetUsersCountProcedure();
             createGetUsersAverageAgeProcedure();
+            callGetUsersAverageAgeProcedure();
             deleteDatabase();
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,13 +52,24 @@ public class MySQLDemo {
         try (Connection connection = DriverManager.getConnection(getDbUrl(DB_NAME))) {
             // @formatter:off
             String query = ""
-                + "CREATE PROCEDURE GetUsersCount(OUT counter INT)\n"
+                + "CREATE PROCEDURE GetUsersCount()\n"
                 + "BEGIN\n"
-                + "    SELECT count(*) INTO counter\n"
-                + "    FROM T_USERS;\n"
+                + "    SELECT count(*) as counter FROM T_USERS;\n"
                 + "END";
             // @formatter:on
             executeStatement(connection, query);
+        }
+    }
+
+    private static void callGetUsersCountProcedure() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(getDbUrl(DB_NAME))) {
+            String query = "{CALL GetUsersCount()}";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet rs = statement.executeQuery(query);
+                while (rs.next()) {
+                    System.out.println(rs.getLong("counter"));
+                }
+            }
         }
     }
 
@@ -63,13 +77,24 @@ public class MySQLDemo {
         try (Connection connection = DriverManager.getConnection(getDbUrl(DB_NAME))) {
             // @formatter:off
             String query = ""
-                + "CREATE PROCEDURE GetUsersAverageAge(OUT counter INT)\n"
+                + "CREATE PROCEDURE GetUsersAverageAge()\n"
                 + "BEGIN\n"
-                + "    SELECT avg(age) INTO counter\n" 
-                + "    FROM T_USERS;\n"
+                + "    SELECT avg(age) as counter FROM T_USERS;\n" 
                 + "END";
             // @formatter:on
             executeStatement(connection, query);
+        }
+    }
+
+    private static void callGetUsersAverageAgeProcedure() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(getDbUrl(DB_NAME))) {
+            String query = "{CALL GetUsersAverageAge()}";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet rs = statement.executeQuery(query);
+                while (rs.next()) {
+                    System.out.println(rs.getDouble("counter"));
+                }
+            }
         }
     }
 
